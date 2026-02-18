@@ -1,0 +1,88 @@
+services:
+
+  # ─── Base de Datos MariaDB ───────────────────────────────
+  db:
+    image: mariadb:10.11
+    container_name: apple_bd
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: apple_tienda
+      MYSQL_USER: dwes
+      MYSQL_PASSWORD: abc123.
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - apple_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "dwes", "-pabc123."]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # ─── phpMyAdmin ──────────────────────────────────────────
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: apple_phpmyadmin
+    restart: always
+    environment:
+      PMA_HOST: db
+      PMA_USER: dwes
+      PMA_PASSWORD: abc123.
+    ports:
+      - "8080:80"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - apple_network
+
+  # ─── Backend Node.js ─────────────────────────────────────
+  backend:
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile
+    container_name: apple_backend
+    restart: always
+    environment:
+      PORT: 3000
+      DB_HOST: db
+      DB_USER: dwes
+      DB_PASSWORD: abc123.
+      DB_NAME: apple_tienda
+      JWT_SECRET: apple_jwt_super_secret_2024
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./Backend:/app
+      - /app/node_modules
+    networks:
+      - apple_network
+
+  # ─── Frontend Angular ────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: apple_frontend
+    restart: always
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend
+    networks:
+      - apple_network
+
+volumes:
+  db_data:
+
+networks:
+  apple_network:
+    driver: bridge
