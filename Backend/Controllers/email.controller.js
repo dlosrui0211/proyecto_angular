@@ -74,3 +74,58 @@ exports.resetPassword = async (req, res) => {
 
   res.json({ mensaje: 'Contraseña actualizada correctamente' });
 };
+
+exports.confirmarPedido = async (req, res) => {
+  try {
+    const { email, nombre, items, total } = req.body;
+
+    const itemsHtml = items.map(i => `
+      <tr>
+        <td style="padding: 12px 0; border-bottom: 1px solid #f0f0f0; color: #1d1d1f;">${i.nombre}</td>
+        <td style="padding: 12px 0; border-bottom: 1px solid #f0f0f0; color: #6e6e73; text-align: center;">x${i.cantidad}</td>
+        <td style="padding: 12px 0; border-bottom: 1px solid #f0f0f0; color: #1d1d1f; text-align: right;">${(i.precio * i.cantidad).toFixed(2)}€</td>
+      </tr>
+    `).join('');
+
+    await transporter.sendMail({
+      from: `"Apple Store" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: 'Confirmación de pedido - Apple Store',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+          <div style="text-align: center; margin-bottom: 32px;">
+            <h1 style="font-size: 28px; font-weight: 700; color: #1d1d1f;">Apple Store</h1>
+          </div>
+          <h2 style="font-size: 22px; color: #1d1d1f;">¡Gracias por tu pedido, ${nombre}!</h2>
+          <p style="color: #6e6e73; font-size: 16px; margin: 12px 0 32px;">Tu pedido ha sido confirmado y está siendo procesado.</p>
+          
+          <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+              <tr>
+                <th style="text-align: left; padding: 12px 0; border-bottom: 2px solid #1d1d1f; color: #1d1d1f;">Producto</th>
+                <th style="text-align: center; padding: 12px 0; border-bottom: 2px solid #1d1d1f; color: #1d1d1f;">Cantidad</th>
+                <th style="text-align: right; padding: 12px 0; border-bottom: 2px solid #1d1d1f; color: #1d1d1f;">Precio</th>
+              </tr>
+            </thead>
+            <tbody>${itemsHtml}</tbody>
+          </table>
+
+          <div style="margin-top: 24px; text-align: right;">
+            <p style="font-size: 20px; font-weight: 700; color: #1d1d1f;">Total: ${total}€</p>
+          </div>
+
+          <div style="margin-top: 32px; padding: 20px; background: #f5f5f7; border-radius: 12px;">
+            <p style="color: #6e6e73; font-size: 14px; margin: 0;">Este es un pedido simulado. No se ha realizado ningún cargo real.</p>
+          </div>
+
+          <p style="color: #aeaeb2; font-size: 13px; text-align: center; margin-top: 32px;">© Apple Store 2024</p>
+        </div>
+      `
+    });
+
+    res.json({ mensaje: 'Email de confirmación enviado' });
+  } catch (err) {
+    console.error('ERROR CONFIRMAR PEDIDO:', err);
+    res.status(500).json({ error: err.message });
+  }
+};
