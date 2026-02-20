@@ -1,0 +1,70 @@
+@if (iphone()) {
+  <div class="detalle-page">
+
+    <!-- Botón volver -->
+    <button class="btn-volver" (click)="volver()">
+      ‹ Volver a iPhone
+    </button>
+
+    <div class="detalle-container">
+
+      <!-- Imagen -->
+      <div class="detalle-imagen">
+        <img [src]="iphone()!.imagen" [alt]="iphone()!.nombre" />
+      </div>
+
+      <!-- Info -->
+      <div class="detalle-info">
+        <p class="detalle-categoria">iPhone</p>
+        <h1>{{ iphone()!.nombre }}</h1>
+
+        <div class="detalle-specs">
+          <div class="spec">
+            <span class="spec-label">Almacenamiento</span>
+            <span class="spec-value">{{ iphone()!.almacenamiento }}</span>
+          </div>
+          <div class="spec">
+            <span class="spec-label">Color</span>
+            <span class="spec-value">{{ iphone()!.color }}</span>
+          </div>
+          <div class="spec">
+            <span class="spec-label">Stock disponible</span>
+            <span class="spec-value">{{ iphone()!.stock }} unidades</span>
+          </div>
+        </div>
+
+        <p class="detalle-desc">{{ iphone()!.descripcion }}</p>
+
+        <p class="detalle-precio">
+          Desde {{ iphone()!.precio | currency:'EUR':'symbol':'1.2-2' }}
+        </p>
+
+        @if (mensaje()) {
+          <div class="mensaje" [class.error]="mensaje().includes('sesión')">
+            {{ mensaje() }}
+          </div>
+        }
+
+        <div class="detalle-actions">
+          <button
+            class="btn-comprar"
+            (click)="agregarAlCarrito()"
+            [disabled]="agregando()">
+            @if (agregando()) {
+              <span class="spinner"></span>
+            } @else {
+              Añadir al carrito
+            }
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+} @else {
+  <div class="cargando">
+    <div class="spinner-grande"></div>
+    <p>Cargando...</p>
+  </div>
+}

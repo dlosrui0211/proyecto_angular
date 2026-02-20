@@ -12,13 +12,68 @@
 }
 
 .navbar-inner {
-  max-width: 980px;
+  max-width: 1200px;
   margin: 0 auto;
   height: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 0 20px;
+}
+
+.nav-left {
   display: flex;
   align-items: center;
+  gap: 16px;
+}
+
+.nav-center {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  justify-content: flex-end;
+}
+
+.nav-link {
+  font-size: 12px;
+  color: #1d1d1f;
+  opacity: 0.8;
+  text-decoration: none;
+  transition: opacity 0.2s;
+  &:hover, &.active { opacity: 1; }
+}
+
+// ── Hamburguesa ──────────────────────────────────────────
+.hamburger {
+  display: flex;
+  flex-direction: column;
   justify-content: space-between;
-  padding: 0 20px;
+  width: 20px;
+  height: 14px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 1100;
+
+  span {
+    display: block;
+    height: 2px;
+    background: #1d1d1f;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+    transform-origin: center;
+  }
+
+  &.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+  &.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+  &.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
 }
 
 .nav-logo {
@@ -40,7 +95,6 @@
     color: #1d1d1f;
     opacity: 0.8;
     transition: opacity 0.2s;
-    letter-spacing: -0.01em;
     &:hover, &.active { opacity: 1; }
   }
 }
@@ -81,16 +135,144 @@
   }
 }
 
-.nav-user {
-  font-size: 12px;
-  color: #1d1d1f;
-  opacity: 0.8;
-}
-
 .nav-signin {
   font-size: 12px;
   color: #1d1d1f;
   opacity: 0.8;
   transition: opacity 0.2s;
+  text-decoration: none;
   &:hover { opacity: 1; }
+}
+
+// ── Overlay ───────────────────────────────────────────────
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 1050;
+  backdrop-filter: blur(2px);
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+// ── Sidebar ───────────────────────────────────────────────
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 280px;
+  height: 100vh;
+  background: #ffffff;
+  z-index: 1100;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(-100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 2px 0 20px rgba(0, 0, 0, 0.1);
+
+  &.open {
+    transform: translateX(0);
+  }
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  height: 44px;
+  border-bottom: 1px solid #e5e5e5;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1d1d1f;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: #6e6e73;
+  padding: 4px;
+  border-radius: 4px;
+  transition: color 0.2s;
+  &:hover { color: #1d1d1f; }
+}
+
+.sidebar-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1d1d1f;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.sidebar-nav {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 12px 8px;
+  gap: 2px;
+  overflow-y: auto;
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  color: #1d1d1f;
+  font-size: 15px;
+  text-decoration: none;
+  border-radius: 10px;
+  transition: background 0.15s;
+  position: relative;
+
+  &:hover { background: #f5f5f7; }
+  &.active {
+    background: #e8e8ed;
+    font-weight: 500;
+  }
+
+  .badge {
+    margin-left: auto;
+    background: #0071e3;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+  }
+}
+
+.sidebar-footer {
+  border-top: 1px solid #e5e5e5;
+  padding: 12px 8px;
+}
+
+.sidebar-logout {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  color: #ff3b30;
+  font-size: 15px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-radius: 10px;
+  width: 100%;
+  transition: background 0.15s;
+  &:hover { background: #fff0ef; }
 }

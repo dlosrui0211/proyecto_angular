@@ -1,9 +1,8 @@
-import { Component, inject } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Component, inject, signal } from '@angular/core';
+import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../services/auth';
 import { CarritoService } from '../services/carrito';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-navbar',
@@ -16,9 +15,15 @@ export class NavbarComponent {
   auth = inject(AuthService);
   carrito = inject(CarritoService);
   router = inject(Router);
+  menuAbierto = signal(false);
+
+
+  toggleMenu() { this.menuAbierto.update(v => !v); }
+  cerrarMenu() { this.menuAbierto.set(false); }
 
   logout() {
     this.auth.logout();
+    this.menuAbierto.set(false);
     this.router.navigate(['/']);
   }
 }

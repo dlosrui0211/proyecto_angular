@@ -1,0 +1,53 @@
+<!-- Header -->
+<section class="iphones-header">
+  <h1>iPhone</h1>
+  <p>Diseñado para ser diferente. Descubre el modelo perfecto para ti.</p>
+
+  <!-- Filtros -->
+  <div class="filtros">
+    <button [class.activo]="filtro() === 'todos'" (click)="filtro.set('todos')">Todos</button>
+    <button [class.activo]="filtro() === 'pro'" (click)="filtro.set('pro')">Pro</button>
+    <button [class.activo]="filtro() === '16'" (click)="filtro.set('16')">iPhone 16</button>
+    <button [class.activo]="filtro() === '15'" (click)="filtro.set('15')">iPhone 15</button>
+  </div>
+</section>
+
+<!-- Toast -->
+@if (mensaje()) {
+  <div class="toast">{{ mensaje() }}</div>
+}
+
+<!-- Grid -->
+<section class="iphones-grid">
+  @for (iphone of filtrados(); track iphone.id) {
+    <div class="card">
+      <div class="card-image">
+        <img [src]="iphone.imagen" [alt]="iphone.nombre" />
+      </div>
+      <div class="card-body">
+        <h3>{{ iphone.nombre }}</h3>
+        <p class="storage">{{ iphone.almacenamiento }} · {{ iphone.color }}</p>
+        <p class="desc">{{ iphone.descripcion }}</p>
+        <div class="card-footer">
+          <p class="precio">Desde {{ iphone.precio | currency:'EUR':'symbol':'1.0-0' }}</p>
+          <div class="card-btns">
+            <a [routerLink]="['/iphones', iphone.id]" class="btn-detalle">Ver más</a>
+            <button class="btn-comprar" (click)="agregarAlCarrito(iphone.id)" [disabled]="agregando() === iphone.id">
+              @if (agregando() === iphone.id) {
+                <span class="spinner"></span>
+              } @else {
+                Añadir
+              }
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (filtrados().length === 0) {
+    <div class="empty">
+      <p>No hay iPhones en esta categoría</p>
+    </div>
+  }
+</section>

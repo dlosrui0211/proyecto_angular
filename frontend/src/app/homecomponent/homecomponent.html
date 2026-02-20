@@ -1,0 +1,49 @@
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-content">
+    <p class="hero-eyebrow">Nuevo</p>
+    <h1 class="hero-title">iPhone 16 Pro</h1>
+    <p class="hero-subtitle">El Poder de Imaginar esta solo en tus manos.</p>
+    <div class="hero-actions">
+      <a routerLink="/iphones" class="btn-primary">Comprar</a>
+      <a routerLink="/iphones" class="btn-secondary">Conoce más ›</a>
+    </div>
+  </div>
+  <div class="hero-image">
+    <img src="https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-model-unselect-gallery-1-202409?wid=800&hei=800&fmt=p-jpg&qlt=80" alt="iPhone 16 Pro" />
+  </div>
+</section>
+
+<!-- Toast -->
+@if (mensaje()) {
+  <div class="toast">{{ mensaje() }}</div>
+}
+
+<!-- Catálogo -->
+<section class="catalogo">
+  <h2 class="catalogo-title">Explora iPhone</h2>
+  <p class="catalogo-subtitle">Elige el modelo perfecto para ti.</p>
+
+  <div class="grid">
+    @for (iphone of iphones(); track iphone.id) {
+      <div class="card">
+        <div class="card-image">
+          <img [src]="iphone.imagen" [alt]="iphone.nombre" />
+        </div>
+        <div class="card-body">
+          <h3 class="card-title">{{ iphone.nombre }}</h3>
+          <p class="card-storage">{{ iphone.almacenamiento }} · {{ iphone.color }}</p>
+          <p class="card-desc">{{ iphone.descripcion }}</p>
+          <p class="card-price">Desde {{ iphone.precio | currency:'EUR':'symbol':'1.0-0' }}</p>
+          <button class="btn-comprar" (click)="agregarAlCarrito(iphone.id)" [disabled]="agregando() === iphone.id">
+            @if (agregando() === iphone.id) {
+              <span class="spinner"></span>
+            } @else {
+              Añadir al carrito
+            }
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+</section>
