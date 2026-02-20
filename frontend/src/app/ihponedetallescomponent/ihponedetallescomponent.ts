@@ -6,7 +6,7 @@ import { CarritoService } from '../services/carrito';
 import { AuthService } from '../services/auth';
 
 @Component({
-  selector: 'app-ihponedetallescomponent',
+  selector: 'app-ihponedetalles',
   standalone: true,
   imports: [CommonModule],
   templateUrl: './ihponedetallescomponent.html',

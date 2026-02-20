@@ -6,7 +6,7 @@ import { CarritoService } from '../services/carrito';
 import { AuthService } from '../services/auth';
 
 @Component({
-  selector: 'app-iphonescomponent',
+  selector: 'app-iphones',
   standalone: true,
   imports: [CommonModule, RouterLink],
   templateUrl: './iphonescomponent.html',

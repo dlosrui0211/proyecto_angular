@@ -1,0 +1,75 @@
+<div class="carrito-page">
+
+  <h1>Mi Carrito</h1>
+
+  @if (!auth.isLoggedIn()) {
+    <div class="empty">
+      <p>Inicia sesión para ver tu carrito</p>
+      <a routerLink="/login" class="btn-login">Iniciar sesión</a>
+    </div>
+  } @else if (carrito.items().length === 0) {
+    <div class="empty">
+      <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="#d2d2d7" viewBox="0 0 16 16">
+        <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>
+      </svg>
+      <p>Tu carrito está vacío</p>
+      <a routerLink="/iphones" class="btn-ver">Ver iPhones</a>
+    </div>
+  } @else {
+    <div class="carrito-container">
+
+      <!-- Lista de items -->
+      <div class="carrito-items">
+        @for (item of carrito.items(); track item.id) {
+          <div class="item">
+            <div class="item-imagen">
+              <img [src]="item.imagen" [alt]="item.nombre" />
+            </div>
+            <div class="item-info">
+              <h3>{{ item.nombre }}</h3>
+              <p>{{ item.almacenamiento }}</p>
+              <p class="item-precio">{{ item.precio | currency:'EUR':'symbol':'1.2-2' }}</p>
+            </div>
+            <div class="item-acciones">
+              <span class="cantidad">x{{ item.cantidad }}</span>
+              <button class="btn-eliminar" (click)="eliminar(item.id)" title="Eliminar">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                  <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                  <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        }
+
+        <button class="btn-vaciar" (click)="vaciar()">Vaciar carrito</button>
+      </div>
+
+      <div class="carrito-resumen">
+        <h2>Resumen del pedido</h2>
+
+        <div class="resumen-linea">
+          <span>Subtotal ({{ carrito.cantidad() }} artículos)</span>
+          <span>{{ carrito.total() | currency:'EUR':'symbol':'1.2-2' }}</span>
+        </div>
+        <div class="resumen-linea">
+          <span>Envío</span>
+          <span class="gratis">Gratis</span>
+        </div>
+
+        <div class="resumen-total">
+          <span>Total</span>
+          <span>{{ carrito.total() | currency:'EUR':'symbol':'1.2-2' }}</span>
+        </div>
+
+        <button class="btn-confirmar" (click)="confirmarPedido()">
+          Confirmar pedido
+        </button>
+
+        <a routerLink="/iphones" class="btn-seguir">Seguir comprando</a>
+      </div>
+
+    </div>
+  }
+
+</div>

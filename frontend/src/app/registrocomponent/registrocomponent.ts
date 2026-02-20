@@ -5,7 +5,7 @@ import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../services/auth';
 
 @Component({
-  selector: 'app-registrocomponent',
+  selector: 'app-registro',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './registrocomponent.html',

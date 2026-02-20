@@ -6,7 +6,7 @@ import { CarritoService } from '../services/carrito';
 import { AuthService } from '../services/auth';
 
 @Component({
-  selector: 'app-homecomponent',
+  selector: 'app-home',
   standalone: true,
   imports: [CommonModule, RouterLink],
   templateUrl: './homecomponent.html',

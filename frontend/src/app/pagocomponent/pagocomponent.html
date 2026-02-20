@@ -1,0 +1,171 @@
+<div class="pago-page">
+
+  <!-- Pasos -->
+  <div class="pasos">
+    <div class="paso-item" [class.activo]="paso() >= 1" [class.completado]="paso() > 1">
+      <span class="paso-num">1</span>
+      <span>Envío</span>
+    </div>
+    <div class="paso-linea" [class.activo]="paso() > 1"></div>
+    <div class="paso-item" [class.activo]="paso() >= 2" [class.completado]="paso() > 2">
+      <span class="paso-num">2</span>
+      <span>Pago</span>
+    </div>
+    <div class="paso-linea" [class.activo]="paso() > 2"></div>
+    <div class="paso-item" [class.activo]="paso() >= 3">
+      <span class="paso-num">3</span>
+      <span>Confirmación</span>
+    </div>
+  </div>
+
+  <div class="pago-container">
+
+    <!-- PASO 1: Envío -->
+    @if (paso() === 1) {
+      <div class="pago-card">
+        <h2>Dirección de envío</h2>
+
+        @if (error()) {
+          <div class="error-msg">{{ error() }}</div>
+        }
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nombre</label>
+            <input type="text" [(ngModel)]="nombre" placeholder="Nombre" class="input-field" />
+          </div>
+          <div class="form-group">
+            <label>Apellidos</label>
+            <input type="text" [(ngModel)]="apellidos" placeholder="Apellidos" class="input-field" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Dirección</label>
+          <input type="text" [(ngModel)]="direccion" placeholder="Calle y número" class="input-field" />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Ciudad</label>
+            <input type="text" [(ngModel)]="ciudad" placeholder="Ciudad" class="input-field" />
+          </div>
+          <div class="form-group">
+            <label>Código Postal</label>
+            <input type="text" [(ngModel)]="codigoPostal" placeholder="00000" class="input-field" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Teléfono</label>
+          <input type="tel" [(ngModel)]="telefono" placeholder="+34 000 000 000" class="input-field" />
+        </div>
+
+        <button class="btn-siguiente" (click)="siguientePaso()">
+          Continuar con el pago →
+        </button>
+      </div>
+    }
+
+    <!-- PASO 2: Pago -->
+    @if (paso() === 2) {
+      <div class="pago-card">
+        <h2>Datos de pago</h2>
+
+        <div class="tarjeta-preview">
+          <div class="tarjeta">
+            <div class="tarjeta-top">
+              <span class="tarjeta-banco">Apple Tienda</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="40" height="24" viewBox="0 0 40 24">
+                <circle cx="15" cy="12" r="10" fill="#eb001b" opacity="0.9"/>
+                <circle cx="25" cy="12" r="10" fill="#f79e1b" opacity="0.9"/>
+              </svg>
+            </div>
+            <p class="tarjeta-numero">{{'•••• •••• •••• ••••' }}</p>
+            <div class="tarjeta-bottom">
+              <div>
+                <p class="tarjeta-label">Titular</p>
+                <p class="tarjeta-valor">{{'NOMBRE APELLIDO' }}</p>
+              </div>
+              <div>
+                <p class="tarjeta-label">Caduca</p>
+                <p class="tarjeta-valor">{{'MM/AA' }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        @if (error()) {
+          <div class="error-msg">{{ error() }}</div>
+        }
+
+        <div class="form-group">
+          <label>Titular de la tarjeta</label>
+          <input type="text" [(ngModel)]="titular" placeholder="Nombre Apellido" class="input-field" />
+        </div>
+
+        <div class="form-group">
+          <label>Número de tarjeta</label>
+          <input type="text" [value]="numeroTarjeta" (input)="formatearTarjeta($event)" placeholder="1234 5678 9012 3456" class="input-field" maxlength="19" />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Fecha de caducidad</label>
+            <input type="text" [value]="caducidad" (input)="formatearCaducidad($event)" placeholder="MM/AA" class="input-field" maxlength="5" />
+          </div>
+          <div class="form-group">
+            <label>CVV</label>
+            <input type="password" [(ngModel)]="cvv" placeholder="•••" class="input-field" maxlength="4" />
+          </div>
+        </div>
+
+        <div class="pago-btns">
+          <button class="btn-atras" (click)="anteriorPaso()">← Volver</button>
+          <button class="btn-pagar" (click)="confirmarPago()" [disabled]="cargando()">
+            @if (cargando()) {
+              <span class="spinner"></span>
+              Procesando...
+            } @else {
+              Pagar {{ carrito.total() | currency:'EUR':'symbol':'1.2-2' }}
+            }
+          </button>
+        </div>
+
+        <p class="seguro">Pago seguro simulado. No se realizará ningún cargo real.</p>
+      </div>
+    }
+
+    <!-- PASO 3: Confirmación -->
+    @if (paso() === 3) {
+      <div class="pago-card confirmacion">
+        <div class="check-icon">✓</div>
+        <h2>¡Pedido confirmado!</h2>
+        <p>Hemos enviado un email de confirmación con los detalles de tu pedido.</p>
+        <button class="btn-inicio" (click)="irAlInicio()">Volver al inicio</button>
+      </div>
+    }
+
+    <!-- Resumen lateral -->
+    @if (paso() < 3) {
+      <div class="resumen">
+        <h3>Resumen</h3>
+        @for (item of carrito.items(); track item.id) {
+          <div class="resumen-item">
+            <img [src]="item.imagen" [alt]="item.nombre" />
+            <div>
+              <p>{{ item.nombre }}</p>
+              <p class="resumen-cantidad">x{{ item.cantidad }}</p>
+            </div>
+            <p class="resumen-precio">{{ (item.precio * item.cantidad) | currency:'EUR':'symbol':'1.2-2' }}</p>
+          </div>
+        }
+        <div class="resumen-total">
+          <span>Total</span>
+          <span>{{ carrito.total() | currency:'EUR':'symbol':'1.2-2' }}</span>
+        </div>
+      </div>
+    }
+
+  </div>
+</div>
