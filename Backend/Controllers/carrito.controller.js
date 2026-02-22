@@ -2,7 +2,7 @@ const db = require('../config/db');
 
 exports.getCarrito = async (req, res) => {
   const [r] = await db.query(
-    `SELECT c.id, p.nombre, p.precio, p.imagen, p.almacenamiento, c.cantidad
+    `SELECT c.id, c.producto_id, p.nombre, p.precio, p.imagen, p.almacenamiento, c.cantidad
      FROM carrito c JOIN productos p ON c.producto_id = p.id
      WHERE c.usuario_id = ?`, [req.usuario.id]);
   res.json(r);
