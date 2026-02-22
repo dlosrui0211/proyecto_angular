@@ -1,0 +1,171 @@
+<div class="perfil-page">
+  @if (cargando()) {
+    <div class="perfil-loading">
+      <span class="spinner"></span>
+    </div>
+  } @else if (perfil(); as p) {
+    <div class="perfil-card">
+
+      <h1>Mi perfil</h1>
+      <p class="perfil-desde">Miembro desde {{ p.created_at | date:'longDate':'':'es' }}</p>
+
+      <!-- Mensajes -->
+      @if (mensaje()) {
+        <div class="success-msg" role="status">{{ mensaje() }}</div>
+      }
+      @if (error()) {
+        <div class="error-msg" role="alert">{{ error() }}</div>
+      }
+
+      <!-- ── Foto de perfil ────────────────────────────── -->
+      <section class="perfil-section">
+        <h2>Foto de perfil</h2>
+        <div class="foto-area">
+          <div class="foto-preview" (click)="abrirSelectorFoto()" role="button" tabindex="0" aria-label="Cambiar foto de perfil" (keydown.enter)="abrirSelectorFoto()">
+            @if (getFotoUrl()) {
+              <img [src]="getFotoUrl()" alt="Foto de perfil" />
+            } @else {
+              <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4z"/>
+              </svg>
+            }
+            @if (subiendoFoto()) {
+              <div class="foto-overlay">
+                <span class="spinner-sm"></span>
+              </div>
+            }
+          </div>
+          <input #fileInput type="file" accept="image/jpeg,image/png,image/webp" (change)="onFotoSeleccionada($event)" class="visually-hidden" aria-label="Seleccionar foto" />
+          <div class="foto-actions">
+            <button class="btn-text" (click)="abrirSelectorFoto()" [disabled]="subiendoFoto()">Cambiar foto</button>
+            @if (getFotoUrl()) {
+              <button class="btn-text btn-text-danger" (click)="eliminarFoto()" [disabled]="subiendoFoto()">Eliminar</button>
+            }
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Datos personales ──────────────────────────── -->
+      <section class="perfil-section">
+        <h2>Datos personales</h2>
+
+        <div class="form-group">
+          <label for="perfil-nombre">Nombre</label>
+          <input
+            id="perfil-nombre"
+            type="text"
+            class="input-field"
+            [(ngModel)]="nombre"
+            placeholder="Tu nombre"
+            autocomplete="name"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="perfil-email">Email</label>
+          <input
+            id="perfil-email"
+            type="email"
+            class="input-field"
+            [(ngModel)]="email"
+            placeholder="tu@email.com"
+            autocomplete="email"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="perfil-telefono">Teléfono</label>
+          <input
+            id="perfil-telefono"
+            type="tel"
+            class="input-field"
+            [(ngModel)]="telefono"
+            placeholder="+34 600 000 000"
+            autocomplete="tel"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="perfil-direccion">Dirección de envío</label>
+          <input
+            id="perfil-direccion"
+            type="text"
+            class="input-field"
+            [(ngModel)]="direccion"
+            placeholder="Calle, número, ciudad..."
+            autocomplete="street-address"
+          />
+        </div>
+
+        <button class="btn-primary" (click)="guardarDatos()" [disabled]="guardando()">
+          @if (guardando()) {
+            <span class="spinner-sm"></span>
+          } @else {
+            Guardar cambios
+          }
+        </button>
+      </section>
+
+      <!-- ── Cambiar contraseña ────────────────────────── -->
+      <section class="perfil-section">
+        <div class="section-header">
+          <h2>Contraseña</h2>
+          <button class="btn-text" (click)="togglePassword()">
+            {{ mostrarPassword() ? 'Cancelar' : 'Cambiar' }}
+          </button>
+        </div>
+
+        @if (exitoPassword()) {
+          <div class="success-msg" role="status">{{ exitoPassword() }}</div>
+        }
+
+        @if (mostrarPassword()) {
+          @if (errorPassword()) {
+            <div class="error-msg" role="alert">{{ errorPassword() }}</div>
+          }
+
+          <div class="form-group">
+            <label for="password-actual">Contraseña actual</label>
+            <input
+              id="password-actual"
+              type="password"
+              class="input-field"
+              [(ngModel)]="passwordActual"
+              autocomplete="current-password"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="password-nueva">Nueva contraseña</label>
+            <input
+              id="password-nueva"
+              type="password"
+              class="input-field"
+              [(ngModel)]="passwordNueva"
+              autocomplete="new-password"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="password-confirm">Confirmar contraseña</label>
+            <input
+              id="password-confirm"
+              type="password"
+              class="input-field"
+              [(ngModel)]="passwordConfirm"
+              autocomplete="new-password"
+            />
+          </div>
+
+          <button class="btn-primary" (click)="cambiarPassword()" [disabled]="guardandoPassword()">
+            @if (guardandoPassword()) {
+              <span class="spinner-sm"></span>
+            } @else {
+              Actualizar contraseña
+            }
+          </button>
+        }
+      </section>
+    </div>
+  }
+</div>

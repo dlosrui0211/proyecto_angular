@@ -4,6 +4,7 @@ import { tap } from 'rxjs';
 
 export interface ItemCarrito {
   id: number;
+  producto_id: number;
   nombre: string;
   precio: number;
   imagen: string;

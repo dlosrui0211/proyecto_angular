@@ -39,12 +39,12 @@ export class RegistroComponent {
     this.cargando.set(true);
     this.error.set('');
 
-    this.auth.register(this.nombre, this.email, this.password).subscribe({
+    this.auth.registro(this.nombre, this.email, this.password).subscribe({
       next: () => {
         this.cargando.set(false);
         this.router.navigate(['/login']);
       },
-      error: (err) => {
+      error: (err: any) => {
         this.cargando.set(false);
         this.error.set(err.error?.error || 'Error al registrarse');
       }

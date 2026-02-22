@@ -1,0 +1,124 @@
+<div class="pedidos-page">
+  <h1>Mis Pedidos</h1>
+
+  @if (error()) {
+    <div class="error-msg" role="alert">{{ error() }}</div>
+  }
+
+  <!-- VISTA LISTA -->
+  @if (!vistaDetalle()) {
+
+    @if (cargando()) {
+      <div class="loading">
+        <span class="spinner"></span>
+        <p>Cargando pedidos…</p>
+      </div>
+    }
+
+    @if (!cargando() && pedidos().length === 0) {
+      <div class="vacio">
+        <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+          <path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2zm15 2h-4v3h4V4zm0 4h-4v3h4V8zm0 4h-4v3h3a1 1 0 0 0 1-1v-2zm-5 3v-3H6v3h4zm-5 0v-3H1v2a1 1 0 0 0 1 1h3zm-4-4h4V8H1v3zm0-4h4V4H1v3zm5-3v3h4V4H6zm4 4H6v3h4V8z"/>
+        </svg>
+        <p>Aún no tienes pedidos</p>
+        <a href="/iphones" class="btn-explorar">Explorar iPhones</a>
+      </div>
+    }
+
+    @if (!cargando() && pedidos().length > 0) {
+      <div class="pedidos-lista">
+        @for (pedido of pedidos(); track pedido.id) {
+          <button
+            class="pedido-card"
+            (click)="verDetalle(pedido.id)"
+            [attr.aria-label]="'Ver pedido número ' + pedido.id">
+            <div class="pedido-top">
+              <span class="pedido-id">#{{ pedido.id }}</span>
+              <span class="pedido-estado" [class]="pedido.estado">
+                {{ getEstadoLabel(pedido.estado) }}
+              </span>
+            </div>
+            <div class="pedido-info">
+              <span class="pedido-fecha">{{ formatFechaCorta(pedido.created_at) }}</span>
+              <span class="pedido-items">{{ pedido.num_items }} artículo{{ pedido.num_items !== 1 ? 's' : '' }}</span>
+            </div>
+            <div class="pedido-total">
+              {{ pedido.total | number:'1.2-2' }} €
+            </div>
+          </button>
+        }
+      </div>
+
+      <!-- Paginación -->
+      @if (totalPaginas() > 1) {
+        <div class="paginacion">
+          <button
+            [disabled]="paginaActual() === 1"
+            (click)="irPagina(paginaActual() - 1)"
+            aria-label="Página anterior">
+            ‹ Anterior
+          </button>
+          <span class="pagina-info">{{ paginaActual() }} / {{ totalPaginas() }}</span>
+          <button
+            [disabled]="paginaActual() === totalPaginas()"
+            (click)="irPagina(paginaActual() + 1)"
+            aria-label="Página siguiente">
+            Siguiente ›
+          </button>
+        </div>
+      }
+    }
+
+  } @else {
+
+    <!-- VISTA DETALLE -->
+    @if (cargando()) {
+      <div class="loading">
+        <span class="spinner"></span>
+        <p>Cargando detalle…</p>
+      </div>
+    }
+
+    @if (!cargando() && pedidoDetalle(); as p) {
+      <button class="btn-volver" (click)="volverLista()">
+        ← Volver a mis pedidos
+      </button>
+
+      <div class="detalle-card">
+        <div class="detalle-header">
+          <div>
+            <h2>Pedido #{{ p.id }}</h2>
+            <span class="detalle-fecha">{{ formatFecha(p.created_at) }}</span>
+          </div>
+          <span class="pedido-estado grande" [class]="p.estado">
+            {{ getEstadoLabel(p.estado) }}
+          </span>
+        </div>
+
+        <!-- Items -->
+        @if (p.items && p.items.length > 0) {
+          <div class="detalle-items">
+            @for (item of p.items; track item.id) {
+              <div class="item-row">
+                <img [src]="item.imagen" [alt]="item.nombre" class="item-img" loading="lazy" />
+                <div class="item-info">
+                  <span class="item-nombre">{{ item.nombre }}</span>
+                  @if (item.almacenamiento) {
+                    <span class="item-storage">{{ item.almacenamiento }}</span>
+                  }
+                </div>
+                <span class="item-qty">x{{ item.cantidad }}</span>
+                <span class="item-precio">{{ item.precio * item.cantidad | number:'1.2-2' }} €</span>
+              </div>
+            }
+          </div>
+        }
+
+        <div class="detalle-total">
+          <span>Total</span>
+          <span class="total-valor">{{ p.total | number:'1.2-2' }} €</span>
+        </div>
+      </div>
+    }
+  }
+</div>

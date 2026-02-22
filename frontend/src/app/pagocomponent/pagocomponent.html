@@ -142,7 +142,10 @@
         <div class="check-icon">✓</div>
         <h2>¡Pedido confirmado!</h2>
         <p>Hemos enviado un email de confirmación con los detalles de tu pedido.</p>
-        <button class="btn-inicio" (click)="irAlInicio()">Volver al inicio</button>
+        <div class="confirmacion-btns">
+          <button class="btn-pedidos" (click)="irAPedidos()">Ver mis pedidos</button>
+          <button class="btn-inicio" (click)="irAlInicio()">Volver al inicio</button>
+        </div>
       </div>
     }
 

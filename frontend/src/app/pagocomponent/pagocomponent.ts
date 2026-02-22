@@ -78,17 +78,36 @@ export class PagoComponent implements OnInit {
 
     // Simular procesamiento de pago
     setTimeout(() => {
-      // Enviar email de confirmación
-      this.http.post('http://localhost:3000/api/email/confirmar-pedido', {
-        email: usuario.email || '',
-        nombre: usuario.nombre,
-        items: items,
-        total: total
-      }).subscribe({
+
+      const usuario = this.auth.getUsuario();
+
+      // 1. Crear pedido en la BD
+      const pedidoItems = items.map(i => ({
+        producto_id: i.producto_id,
+        cantidad: i.cantidad,
+        precio: i.precio
+      }));
+
+      this.http.post('http://localhost:3000/api/pedidos', { items: pedidoItems }).subscribe({
         next: () => {
-          this.carrito.vaciar().subscribe();
-          this.cargando.set(false);
-          this.paso.set(3);
+          // 2. Enviar email de confirmación
+          this.http.post('http://localhost:3000/api/email/confirmar-pedido', {
+            email: usuario?.email || '',
+            nombre: usuario?.nombre || '',
+            items: items,
+            total: total
+          }).subscribe({
+            next: () => {
+              this.carrito.vaciar().subscribe();
+              this.cargando.set(false);
+              this.paso.set(3);
+            },
+            error: () => {
+              this.carrito.vaciar().subscribe();
+              this.cargando.set(false);
+              this.paso.set(3);
+            }
+          });
         },
         error: () => {
           this.carrito.vaciar().subscribe();
@@ -113,5 +132,9 @@ export class PagoComponent implements OnInit {
 
   irAlInicio() {
     this.router.navigate(['/']);
+  }
+
+  irAPedidos() {
+    this.router.navigate(['/pedidos']);
   }
 }

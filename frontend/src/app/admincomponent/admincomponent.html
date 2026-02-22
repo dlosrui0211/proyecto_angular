@@ -1,0 +1,251 @@
+<div class="admin-container">
+
+  <!-- Mensajes -->
+  @if (mensaje()) {
+    <div class="toast success">{{ mensaje() }}</div>
+  }
+  @if (error()) {
+    <div class="toast error">{{ error() }}</div>
+  }
+
+  <!-- VISTA LISTA -->
+  @if (!vistaDetalle()) {
+
+    <header class="admin-header">
+      <h1>Panel de Administración</h1>
+      <p class="subtitle">Gestión de pedidos</p>
+    </header>
+
+    <!-- Stats -->
+    @if (stats(); as s) {
+      <div class="stats-grid">
+        <div class="stat-card">
+          <span class="stat-number">{{ s.total_pedidos }}</span>
+          <span class="stat-label">Total Pedidos</span>
+        </div>
+        <div class="stat-card pendiente">
+          <span class="stat-number">{{ s.pendientes }}</span>
+          <span class="stat-label">Pendientes</span>
+        </div>
+        <div class="stat-card completado">
+          <span class="stat-number">{{ s.completados }}</span>
+          <span class="stat-label">Completados</span>
+        </div>
+        <div class="stat-card cancelado">
+          <span class="stat-number">{{ s.cancelados }}</span>
+          <span class="stat-label">Cancelados</span>
+        </div>
+        <div class="stat-card ingresos">
+          <span class="stat-number">{{ s.ingresos_totales | number:'1.2-2' }}€</span>
+          <span class="stat-label">Ingresos Totales</span>
+        </div>
+      </div>
+    }
+
+    <!-- Filtros -->
+    <div class="filtros">
+      <button
+        [class.active]="filtroEstado() === ''"
+        (click)="filtrar('')">
+        Todos
+      </button>
+      <button
+        [class.active]="filtroEstado() === 'pendiente'"
+        (click)="filtrar('pendiente')">
+        Pendientes
+      </button>
+      <button
+        [class.active]="filtroEstado() === 'completado'"
+        (click)="filtrar('completado')">
+        Completados
+      </button>
+      <button
+        [class.active]="filtroEstado() === 'cancelado'"
+        (click)="filtrar('cancelado')">
+        Cancelados
+      </button>
+    </div>
+
+    <!-- Loading -->
+    @if (cargando()) {
+      <div class="loading">
+        <div class="spinner"></div>
+        <span>Cargando pedidos...</span>
+      </div>
+    }
+
+    <!-- Tabla pedidos -->
+    @if (!cargando() && pedidos().length > 0) {
+      <div class="tabla-wrapper">
+        <table class="tabla-pedidos" role="table" aria-label="Lista de pedidos">
+          <thead>
+            <tr>
+              <th scope="col">ID</th>
+              <th scope="col">Cliente</th>
+              <th scope="col">Items</th>
+              <th scope="col">Total</th>
+              <th scope="col">Estado</th>
+              <th scope="col">Fecha</th>
+              <th scope="col">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (pedido of pedidos(); track pedido.id) {
+              <tr>
+                <td class="col-id">#{{ pedido.id }}</td>
+                <td class="col-cliente">
+                  <span class="cliente-nombre">{{ pedido.usuario_nombre }}</span>
+                  <span class="cliente-email">{{ pedido.usuario_email }}</span>
+                </td>
+                <td class="col-items">{{ pedido.num_items }}</td>
+                <td class="col-total">{{ pedido.total | number:'1.2-2' }}€</td>
+                <td class="col-estado">
+                  <select
+                    [ngModel]="pedido.estado"
+                    (ngModelChange)="cambiarEstado(pedido.id, $event)"
+                    [class]="'estado-select ' + pedido.estado"
+                    [attr.aria-label]="'Cambiar estado del pedido ' + pedido.id">
+                    <option value="pendiente">Pendiente</option>
+                    <option value="completado">Completado</option>
+                    <option value="cancelado">Cancelado</option>
+                  </select>
+                </td>
+                <td class="col-fecha">{{ formatFecha(pedido.created_at) }}</td>
+                <td class="col-acciones">
+                  <button class="btn-accion ver" (click)="verDetalle(pedido.id)" aria-label="Ver detalle">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                      <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+                      <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+                    </svg>
+                  </button>
+                  <button class="btn-accion eliminar" (click)="eliminarPedido(pedido.id)" aria-label="Eliminar pedido">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                      <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                      <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H5.5l1-1h3l1 1H14a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118z"/>
+                    </svg>
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Paginación -->
+      @if (totalPaginas() > 1) {
+        <div class="paginacion">
+          <button
+            [disabled]="paginaActual() === 1"
+            (click)="irPagina(paginaActual() - 1)"
+            aria-label="Página anterior">
+            ‹
+          </button>
+          <span class="pagina-info">{{ paginaActual() }} / {{ totalPaginas() }}</span>
+          <button
+            [disabled]="paginaActual() === totalPaginas()"
+            (click)="irPagina(paginaActual() + 1)"
+            aria-label="Página siguiente">
+            ›
+          </button>
+        </div>
+      }
+    }
+
+    @if (!cargando() && pedidos().length === 0) {
+      <div class="vacio">
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2zm15 2h-4v3h4V4zm0 4h-4v3h4V8zm0 4h-4v3h3a1 1 0 0 0 1-1v-2zm-5 3v-3H6v3h4zm-5 0v-3H1v2a1 1 0 0 0 1 1h3zm-4-4h4V8H1v3zm0-4h4V4H1v3zm5-3v3h4V4H6zm4 4H6v3h4V8z"/>
+        </svg>
+        <p>No hay pedidos{{ filtroEstado() ? ' con estado "' + filtroEstado() + '"' : '' }}</p>
+      </div>
+    }
+
+  } @else {
+
+    <!-- VISTA DETALLE -->
+    @if (pedidoDetalle(); as p) {
+      <div class="detalle">
+        <button class="btn-volver" (click)="volverLista()">
+          ← Volver a la lista
+        </button>
+
+        <div class="detalle-header">
+          <div>
+            <h2>Pedido #{{ p.id }}</h2>
+            <span class="detalle-fecha">{{ formatFecha(p.created_at) }}</span>
+          </div>
+          <div class="detalle-acciones">
+            <select
+              [ngModel]="p.estado"
+              (ngModelChange)="cambiarEstado(p.id, $event)"
+              [class]="'estado-select grande ' + p.estado"
+              aria-label="Cambiar estado del pedido">
+              <option value="pendiente">Pendiente</option>
+              <option value="completado">Completado</option>
+              <option value="cancelado">Cancelado</option>
+            </select>
+            <button class="btn-eliminar" (click)="eliminarPedido(p.id)">
+              Eliminar pedido
+            </button>
+          </div>
+        </div>
+
+        <!-- Info cliente -->
+        <div class="detalle-seccion">
+          <h3>Cliente</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">Nombre</span>
+              <span class="info-value">{{ p.usuario_nombre }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Email</span>
+              <span class="info-value">{{ p.usuario_email }}</span>
+            </div>
+            @if (p.usuario_telefono) {
+              <div class="info-item">
+                <span class="info-label">Teléfono</span>
+                <span class="info-value">{{ p.usuario_telefono }}</span>
+              </div>
+            }
+            @if (p.usuario_direccion) {
+              <div class="info-item">
+                <span class="info-label">Dirección</span>
+                <span class="info-value">{{ p.usuario_direccion }}</span>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Items -->
+        <div class="detalle-seccion">
+          <h3>Productos</h3>
+          @if (p.items && p.items.length > 0) {
+            <div class="items-lista">
+              @for (item of p.items; track item.id) {
+                <div class="item-row">
+                  <img [src]="item.imagen" [alt]="item.nombre" class="item-img" loading="lazy">
+                  <div class="item-info">
+                    <span class="item-nombre">{{ item.nombre }}</span>
+                    @if (item.almacenamiento) {
+                      <span class="item-storage">{{ item.almacenamiento }}</span>
+                    }
+                  </div>
+                  <span class="item-qty">x{{ item.cantidad }}</span>
+                  <span class="item-precio">{{ item.precio * item.cantidad | number:'1.2-2' }}€</span>
+                </div>
+              }
+            </div>
+          }
+
+          <div class="detalle-total">
+            <span>Total</span>
+            <span class="total-valor">{{ p.total | number:'1.2-2' }}€</span>
+          </div>
+        </div>
+
+      </div>
+    }
+  }
+
+</div>
